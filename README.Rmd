@@ -1,0 +1,77 @@
+---
+output: github_document
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+
+library(OCepi)
+library(dplyr)
+library(jarvis)
+library(ggplot2)
+```
+
+# jarvis
+
+![](https://img.shields.io/badge/lifecycle-experimental-brightgreen.svg)
+
+## Installation
+
+```r
+pak::pak("ericmshearer/jarvis")
+```
+
+## Tables
+
+`tbl_totals()`
+
+-   Default calculates column totals. For row, set `where` to "row".
+-   Name of summed cell defaults to "Total". To change, update `name`.
+
+```{r tbl_totals}
+linelist |>
+  count(Race) |>
+  tbl_totals()
+```
+
+`tbl_percentage()`
+
+-   Control rounding via `digits`.
+-   Default calculates column percentages. For row, set `where` to "row".
+
+```{r tbl_percentage}
+linelist |>
+  count(Race) |>
+  tbl_percentage()
+```
+
+## Data Visualization
+
+`scale_percent()`
+
+For unscaled percentages (i.e. not multiplied by 100), update `scale` to FALSE. 
+
+```{r scale_percent, fig.width = 14, fig.asp = 0.8}
+linelist |>
+  count(Race) |>
+  mutate(percent = add_percent(n)) |>
+  ggplot(aes(x = Race, y = percent)) +
+  geom_bar(stat = "identity") +
+  scale_x_discrete(label = wrap_labels(delim = "or")) +
+  scale_y_continuous(expand = c(0,0), label = scale_percent()) +
+  theme_apollo()
+```
+
+
+## Date/Time
+
+`excel_date()`
+
+```{r excel_date}
+excel_date(as.numeric(45576))
+```

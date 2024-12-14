@@ -1,0 +1,16 @@
+Package: jarvis
+Type: Package
+Title: Playground of helper functions
+Version: 0.1.0
+Authors@R: c(
+    person("Eric", "Shearer", , "ericshearer@me.com", role = c("aut","cre","cph"))
+  )
+Description: Even Dead I Am Still The Hero.
+Depends:
+  R (>= 3.5.0)
+Imports:
+  cli
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.2
