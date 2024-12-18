@@ -28,6 +28,21 @@ pak::pak("ericmshearer/jarvis")
 
 ## Tables
 
+`tbl()`
+
+-   `scaled` controls whether or not percent is multiplied by 100.
+-   `digits` sets rounding.
+
+```{r tbl1}
+linelist |>
+  tbl(Gender)
+```
+
+```{r tbl2}
+linelist |>
+  tbl(Gender, Ethnicity)
+```
+
 `tbl_totals()`
 
 -   Default calculates column totals. For row, set `where` to "row".

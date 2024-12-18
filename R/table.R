@@ -1,3 +1,33 @@
+#' Frequency Table
+#'
+#' @param df Input data.frame
+#' @param ... Variables you want to summarize. If one variable, returns n and percent. If 2 or more, uses tidyr::pivot_wider and only returns n.
+#' @param scaled Is percent multiplied by 100 or returned as fraction.
+#' @param digits Rounding for percent.
+#'
+#' @return Frequency tbl.
+#' @export
+#' @importFrom tidyr pivot_wider
+tbl <- function(df, ..., scaled = TRUE, digits = 1){
+  df_class <- class(df)
+
+  y <- collect_vars(...)
+  df <- df[, y, drop = FALSE]
+  init <- rip_count(df)
+
+  names(init) <- c(y, "n")
+  init[init > 0]
+
+  if(length(y) > 1){
+    out <- tidyr::pivot_wider(init, names_from = y[2], values_from = "n", values_fill = 0)
+  } else {
+    init$percent <- OCepi::add_percent(init$n, digits = digits, multiply = scaled)
+    out <- init
+  }
+    class(out) <- df_class
+    return(out)
+}
+
 #' Column Percentages
 #'
 #' @param df Input data, usually follows dplyr::count.
@@ -87,14 +117,9 @@ tbl_totals <- function(df, where = c("row","col"), name = "Total"){
 
   if(where == "col"){
     totals <- colSums(df[, numeric_cols, drop = FALSE], na.rm = TRUE)
-
-    totals_row <- rep(NA, ncol(df))
-    totals_row[numeric_cols] <- totals
-
+    totals_row <- c(NA, totals)
     out <- rbind(df, totals_row)
-
     spot <- rownames(out)[nrow(out)]
-
     out[spot,1] <- name
   } else {
     out <- df
@@ -125,9 +150,18 @@ na_to_zero <- function(df){
   return(df)
 }
 
+#tbl helpers
 col_percentage <- function(col, digits){
   col[is.na(col)] <- 0
   column_sum <- sum(col, na.rm = TRUE)
   col <- round((col / column_sum) * 100, digits = digits)
   return(col)
-  }
+}
+
+collect_vars <- function(...){
+  sapply(substitute(...()), deparse)
+}
+
+rip_count <- function(df){
+  as.data.frame(table(df), stringsAsFactors = FALSE)
+}
