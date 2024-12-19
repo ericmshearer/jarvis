@@ -32,6 +32,7 @@ pak::pak("ericmshearer/jarvis")
 
 -   `scaled` controls whether or not percent is multiplied by 100.
 -   `digits` sets rounding.
+-   For tables >1 variable, can pivot long to wide by setting `pivot` to TRUE.
 
 ```{r tbl1}
 linelist |>
@@ -40,28 +41,28 @@ linelist |>
 
 ```{r tbl2}
 linelist |>
-  tbl(Gender, Ethnicity)
+  tbl(Gender, Ethnicity, pivot = TRUE)
 ```
 
 `tbl_totals()`
 
--   Default calculates column totals. For row, set `where` to "row".
+-   Default calculates column totals. For row, set `loc` to "row". Or can use "both".
 -   Name of summed cell defaults to "Total". To change, update `name`.
 
 ```{r tbl_totals}
 linelist |>
-  count(Race) |>
+  tbl(Race) |>
   tbl_totals()
 ```
 
 `tbl_percentage()`
 
 -   Control rounding via `digits`.
--   Default calculates column percentages. For row, set `where` to "row".
+-   Default calculates column percentages. For row, set `loc` to "row".
 
 ```{r tbl_percentage}
 linelist |>
-  count(Race) |>
+  tbl(Race, Ethnicity, pivot = TRUE) |>
   tbl_percentage()
 ```
 

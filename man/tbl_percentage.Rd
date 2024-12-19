@@ -4,12 +4,12 @@
 \alias{tbl_percentage}
 \title{Column Percentages}
 \usage{
-tbl_percentage(df, where = c("row", "col"), digits = 1)
+tbl_percentage(df, loc = c("row", "col"), digits = 1)
 }
 \arguments{
 \item{df}{Input data, usually follows dplyr::count.}
 
-\item{where}{Either row or col. Where do you want the percentage to go.}
+\item{loc}{Either row or col. Where do you want the percentage to go.}
 
 \item{digits}{For rounding.}
 }

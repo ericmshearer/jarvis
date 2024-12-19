@@ -4,7 +4,7 @@
 \alias{tbl}
 \title{Frequency Table}
 \usage{
-tbl(df, ..., scaled = TRUE, digits = 1)
+tbl(df, ..., scaled = TRUE, digits = 1, pivot = FALSE)
 }
 \arguments{
 \item{df}{Input data.frame}
@@ -14,6 +14,8 @@ tbl(df, ..., scaled = TRUE, digits = 1)
 \item{scaled}{Is percent multiplied by 100 or returned as fraction.}
 
 \item{digits}{Rounding for percent.}
+
+\item{pivot}{Logical, pivot long to wide.}
 }
 \value{
 Frequency tbl.

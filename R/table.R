@@ -4,11 +4,12 @@
 #' @param ... Variables you want to summarize. If one variable, returns n and percent. If 2 or more, uses tidyr::pivot_wider and only returns n.
 #' @param scaled Is percent multiplied by 100 or returned as fraction.
 #' @param digits Rounding for percent.
+#' @param pivot Logical, pivot long to wide.
 #'
 #' @return Frequency tbl.
 #' @export
 #' @importFrom tidyr pivot_wider
-tbl <- function(df, ..., scaled = TRUE, digits = 1){
+tbl <- function(df, ..., scaled = TRUE, digits = 1, pivot = FALSE){
   df_class <- class(df)
 
   y <- collect_vars(...)
@@ -19,19 +20,23 @@ tbl <- function(df, ..., scaled = TRUE, digits = 1){
   init[init > 0]
 
   if(length(y) > 1){
-    out <- tidyr::pivot_wider(init, names_from = y[2], values_from = "n", values_fill = 0)
+    if(pivot){
+      out <- tidyr::pivot_wider(init, names_from = y[2], values_from = "n", values_fill = 0)
+    } else {
+      out <- init
+    }
   } else {
     init$percent <- OCepi::add_percent(init$n, digits = digits, multiply = scaled)
     out <- init
   }
-    class(out) <- df_class
-    return(out)
+  class(out) <- df_class
+  return(out)
 }
 
 #' Column Percentages
 #'
 #' @param df Input data, usually follows dplyr::count.
-#' @param where Either row or col. Where do you want the percentage to go.
+#' @param loc Either row or col. Where do you want the percentage to go.
 #' @param digits For rounding.
 #'
 #' @return Table with cells as percentages of column.
@@ -42,12 +47,14 @@ tbl <- function(df, ..., scaled = TRUE, digits = 1){
 #' @examples
 #' df <- data.frame(loc = c("A","B","C"), n = c(5,10,6))
 #' tbl_percentage(df)
-tbl_percentage <- function(df, where = c("row","col"), digits = 1) {
-  if(missing(where)){
-    where <- "col"
+tbl_percentage <- function(df, loc = c("row","col"), digits = 1) {
+  if(missing(loc)){
+    loc <- "col"
   }
 
-  if(where == "col"){
+  loc <- match.arg(loc)
+
+  if(loc == "col"){
     firstcol_lastrow <- rownames(df)[nrow(df)]
 
     check <- toString(df[firstcol_lastrow,1])
@@ -86,7 +93,7 @@ tbl_percentage <- function(df, where = c("row","col"), digits = 1) {
     out <- cbind(df[,col_to_add], results)
 
     if(check %in% c("Total","Sum")){
-      out <- jarvis::tbl_totals(out, where = "row")
+      out <- jarvis::tbl_totals(out, loc = "row")
     } else {
       out
     }
@@ -98,7 +105,7 @@ tbl_percentage <- function(df, where = c("row","col"), digits = 1) {
 #' Column or Row Totals
 #'
 #' @param df Input data, usually follows dplyr::count.
-#' @param where Do you want to sum the row or column
+#' @param loc Do you want to sum the row, column, or both.
 #' @param name Name of summed celled. Defaults to total.
 #'
 #' @return Table with added totals.
@@ -108,26 +115,32 @@ tbl_percentage <- function(df, where = c("row","col"), digits = 1) {
 #' @examples
 #' df <- data.frame(loc = c("A","B","C"), n = c(5,10,6))
 #' tbl_totals(df)
-tbl_totals <- function(df, where = c("row","col"), name = "Total"){
+tbl_totals <- function(df, loc = c("col","row","both"), name = "Total"){
+  if(missing(loc)){
+    loc <- "col"
+  }
+
+  loc = match.arg(loc)
+
   numeric_cols <- sapply(df, is.numeric)
 
-  if(missing(where) | is.null(where)){
-    where <- "col"
-  }
+  col_totals <- c(NA, colSums(df[, numeric_cols, drop = FALSE], na.rm = TRUE))
+  row_totals <- rowSums(df[, numeric_cols, drop = FALSE], na.rm = TRUE)
 
-  if(where == "col"){
-    totals <- colSums(df[, numeric_cols, drop = FALSE], na.rm = TRUE)
-    totals_row <- c(NA, totals)
-    out <- rbind(df, totals_row)
-    spot <- rownames(out)[nrow(out)]
-    out[spot,1] <- name
+  if(loc == "col"){
+    df <- rbind(df, col_totals)
+    df[nrow(df),1] <- name
+  } else if(loc == "row"){
+    df[[name]] <- row_totals
   } else {
-    out <- df
-    totals <- rowSums(df[, numeric_cols, drop = FALSE], na.rm = TRUE)
-    out[[name]] <- totals
+    df[[name]] <- row_totals
+    numeric_cols <- sapply(df, is.numeric)
+    col_totals2 <- c(NA, colSums(df[, numeric_cols, drop = FALSE], na.rm = TRUE))
+    df <- rbind(df, col_totals2)
+    df[nrow(df),1] <- name
   }
 
-  return(out)
+  return(df)
 }
 
 #' Convert NA Numeric Cells to Zero

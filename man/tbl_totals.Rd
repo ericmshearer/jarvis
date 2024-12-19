@@ -4,12 +4,12 @@
 \alias{tbl_totals}
 \title{Column or Row Totals}
 \usage{
-tbl_totals(df, where = c("row", "col"), name = "Total")
+tbl_totals(df, loc = c("col", "row", "both"), name = "Total")
 }
 \arguments{
 \item{df}{Input data, usually follows dplyr::count.}
 
-\item{where}{Do you want to sum the row or column}
+\item{loc}{Do you want to sum the row, column, or both.}
 
 \item{name}{Name of summed celled. Defaults to total.}
 }

@@ -1,11 +1,11 @@
 Package: jarvis
 Type: Package
-Title: Playground of helper functions
+Title: Even Dead I Am Still The Hero
 Version: 0.1.0
 Authors@R: c(
     person("Eric", "Shearer", , "ericshearer@me.com", role = c("aut","cre","cph"))
   )
-Description: Even Dead I Am Still The Hero.
+Description: Avengers Assemble.
 Depends:
   R (>= 3.5.0)
 Imports:
