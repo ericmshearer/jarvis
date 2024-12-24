@@ -14,3 +14,14 @@ scale_percent <- function(x, ..., scale = TRUE){
     function(x) format(paste0(x, "%"), ...)
   }
 }
+
+#' Add Length to X Scale
+#'
+#' @param x Numeric, how much to add to x-scale. Depends on what class x-scale is e.g. date, continuous.
+#'
+#' @return X-scale expanded to the right by x.
+#' @export
+#' @importFrom ggplot2 expansion
+expand_x <- function(x){
+  ggplot2::expansion(add = c(0,x))
+}

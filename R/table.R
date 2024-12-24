@@ -143,26 +143,6 @@ tbl_totals <- function(df, loc = c("col","row","both"), name = "Total"){
   return(df)
 }
 
-#' Convert NA Numeric Cells to Zero
-#'
-#' @param df Input data frame, usually following dplyr::count.
-#'
-#' @return Data frame with NAs replaced with zero.
-#' @rdname na_to_zero
-#' @export
-#'
-#' @examples
-#' df <- data.frame(loc = c("A","B","C"), n = c(5,NA,6))
-#' na_to_zero(df)
-na_to_zero <- function(df){
-  numeric_cols <- sapply(df, is.numeric)
-  df[numeric_cols] <- lapply(df[numeric_cols], function(x) {
-    x[is.na(x)] <- 0
-    return(x)
-  })
-  return(df)
-}
-
 #tbl helpers
 col_percentage <- function(col, digits){
   col[is.na(col)] <- 0

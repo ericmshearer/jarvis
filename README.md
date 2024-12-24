@@ -109,11 +109,47 @@ linelist |>
 
 <img src="man/figures/README-scale_percent-1.png" width="100%" />
 
-## Date/Time
+`scale_color_apollo()`
 
-`excel_date()`
+- Current palettes: Bright, Muted, Okabe Ito.
+- Reverse palette via `reverse`, logical.
 
 ``` r
-excel_date(as.numeric(45576))
-#> [1] "2024-10-11"
+covid <- read.csv("https://data.chhs.ca.gov/dataset/f333528b-4d38-4814-bebb-12db1f10f535/resource/046cdd2b-31e5-4d34-9ed3-b48cdbc4be7a/download/covid19cases_test.csv", na.strings = "", stringsAsFactors = FALSE) |>
+  filter(area %in% c("Orange","Los Angeles","San Diego","Ventura","San Bernardino","Kern"))
+
+covid <- covid |>
+  group_by(area) |>
+  mutate(
+    date = as.Date(date, "%Y-%m-%d"),
+    rate = rate_per_100k(cases, population, digits = 1),
+    rate_ma_7 = round(zoo::rollmean(rate, k = 7, align = "right", na.pad = FALSE, fill = 0), digits = 2)
+  ) |>
+  ungroup() |>
+  filter(date <= "2020-12-23", date > "2020-08-01")
+
+ggplot(data = covid, aes(x = date, y = rate_ma_7, color = area)) +
+  geom_line(linewidth = 1.2) +
+  theme_apollo() +
+  scale_y_continuous(expand = c(0,0), limits = c(0,200)) +
+  scale_color_apollo(name = "Bright")
 ```
+
+<img src="man/figures/README-scale_color_apollo-1.png" width="100%" />
+
+`expand_x()`
+
+For time series plots that need x-scale extend to fit everything. Set
+`expand` equal to `expand_x()` with a numeric value.
+
+``` r
+ggplot(data = covid, aes(x = date, y = rate_ma_7, color = area)) +
+  geom_line(linewidth = 1.2) +
+  geom_text(data = end_points(covid, date), aes(label = area), size = 4.5, hjust = -0.1, show.legend = FALSE) +
+  theme_apollo() +
+  scale_x_date(expand = expand_x(20)) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,200)) +
+  scale_color_apollo(name = "Bright")
+```
+
+<img src="man/figures/README-expand_x-1.png" width="100%" />
