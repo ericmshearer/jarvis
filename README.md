@@ -139,8 +139,9 @@ ggplot(data = covid, aes(x = date, y = rate_ma_7, color = area)) +
 
 `expand_x()`
 
-For time series plots that need x-scale extend to fit everything. Set
-`expand` equal to `expand_x()` with a numeric value.
+For time series plots that need a little more room on the x-scale to fit
+everything, including end point labels. Input should be class numeric,
+and is relative to the scale of your axis.
 
 ``` r
 ggplot(data = covid, aes(x = date, y = rate_ma_7, color = area)) +

@@ -2,6 +2,7 @@
 
 export(excel_date)
 export(expand_x)
+export(extract_zip)
 export(scale_color_apollo)
 export(scale_percent)
 export(tbl)

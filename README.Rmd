@@ -70,17 +70,18 @@ linelist |>
 
 `scale_percent()`
 
-For unscaled percentages (i.e. not multiplied by 100), update `scale` to FALSE. 
+-   Assumes percentages are multipled by 100. If not, set `scale` to FALSE. 
 
 ```{r scale_percent, fig.width = 14, fig.asp = 0.8}
 linelist |>
-  count(Race) |>
-  mutate(percent = add_percent(n)) |>
+  tbl(Race) |>
+  mutate(label = n_percent(n, percent, reverse = TRUE)) |>
   ggplot(aes(x = Race, y = percent)) +
   geom_bar(stat = "identity") +
   scale_x_discrete(label = wrap_labels(delim = "or")) +
-  scale_y_continuous(expand = c(0,0), label = scale_percent()) +
-  theme_apollo()
+  scale_y_continuous(expand = c(0,0), label = scale_percent(), limits = c(0,18)) +
+  theme_apollo() +
+  apollo_label(aes(label = label), vjust = -0.3)
 ```
 
 `scale_color_apollo()`
@@ -88,7 +89,7 @@ linelist |>
 -   Current palettes: Bright, Muted, Okabe Ito.
 -   Reverse palette via `reverse`, logical.
 
-```{r scale_color_apollo, fig.width = 16, fig.asp = 0.6}
+```{r scale_color_apollo, fig.width = 16, fig.asp = 0.75}
 covid <- read.csv("https://data.chhs.ca.gov/dataset/f333528b-4d38-4814-bebb-12db1f10f535/resource/046cdd2b-31e5-4d34-9ed3-b48cdbc4be7a/download/covid19cases_test.csv", na.strings = "", stringsAsFactors = FALSE) |>
   filter(area %in% c("Orange","Los Angeles","San Diego","Ventura","San Bernardino","Kern"))
 
@@ -111,9 +112,9 @@ ggplot(data = covid, aes(x = date, y = rate_ma_7, color = area)) +
 
 `expand_x()`
 
-For time series plots that need x-scale extend to fit everything. Set `expand` equal to `expand_x()` with a numeric value.
+For time series plots that need a little more room on the x-scale to fit everything, including end point labels. Input should be class numeric, and is relative to the scale of your axis.
 
-```{r expand_x, fig.width = 16, fig.asp = 0.6}
+```{r expand_x, fig.width = 16, fig.asp = 0.75}
 ggplot(data = covid, aes(x = date, y = rate_ma_7, color = area)) +
   geom_line(linewidth = 1.2) +
   geom_text(data = end_points(covid, date), aes(label = area), size = 4.5, hjust = -0.1, show.legend = FALSE) +
