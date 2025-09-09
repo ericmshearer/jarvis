@@ -67,7 +67,7 @@ move_column <- function(df, column, Position = 1){
   col_names <- names(df)
 
   for(i in column){
-    x <- i == colnames
+    x <- i == col_names
     if(all(!x)){
       warning(paste('Column \"', i, '"\ not found.'))
     } else {
