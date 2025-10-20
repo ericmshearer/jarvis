@@ -3,7 +3,7 @@
 #' @param df Data.frame
 #' @param contains Search terms, search multiple patterns using |.
 #'
-#' @returns Vector, charachter.
+#' @returns Vector, character.
 #' @export
 contains_columns <- function(df, contains){
   search <- grepl(contains, colnames(df), ignore.case = TRUE)

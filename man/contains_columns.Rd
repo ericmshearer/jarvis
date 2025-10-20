@@ -12,7 +12,7 @@ contains_columns(df, contains)
 \item{contains}{Search terms, search multiple patterns using |.}
 }
 \value{
-Vector, charachter.
+Vector, character.
 }
 \description{
 Find Columns that Contain String

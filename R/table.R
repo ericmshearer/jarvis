@@ -17,7 +17,7 @@ tbl <- function(df, ..., scaled = TRUE, digits = 1, pivot = FALSE){
   init <- rip_count(df)
 
   names(init) <- c(y, "n")
-  init[init > 0]
+  init <- init[init$n > 0,]
 
   if(length(y) > 1){
     if(pivot){
@@ -26,7 +26,7 @@ tbl <- function(df, ..., scaled = TRUE, digits = 1, pivot = FALSE){
       out <- init
     }
   } else {
-    init$percent <- OCepi::add_percent(init$n, digits = digits, multiply = scaled)
+    init$percent <- round(init$n/sum(init$n) * 100, digits = digits)
     out <- init
   }
   class(out) <- df_class
@@ -42,62 +42,46 @@ tbl <- function(df, ..., scaled = TRUE, digits = 1, pivot = FALSE){
 #' @return Table with cells as percentages of column.
 #' @rdname tbl_percentage
 #' @export
-#' @importFrom utils head
+#' @importFrom purrr map_dfr
+#' @importFrom dplyr bind_rows
 #'
 #' @examples
 #' df <- data.frame(loc = c("A","B","C"), n = c(5,10,6))
-#' tbl_percentage(df)
+#' tbl_percentage(df, loc = "col")
 tbl_percentage <- function(df, loc = c("row","col"), digits = 1) {
-  if(missing(loc)){
-    loc <- "col"
-  }
-
   loc <- match.arg(loc)
 
   if(loc == "col"){
-    firstcol_lastrow <- rownames(df)[nrow(df)]
 
-    check <- toString(df[firstcol_lastrow,1])
+    check <- any(toString(df[nrow(df),1]) %in% c("Total","Sum","TOTAL","SUM","total","sum"))
 
-    if(check %in% c("Total","Sum")){
-      df <- head(df, -1)
+    if(check){
+      df <- df[-nrow(df),]
     }
 
     numeric_cols <- sapply(df, is.numeric)
+    df[,numeric_cols] <- lapply(df[,numeric_cols, drop = FALSE], col_percentage, digits = digits)
+    out <- df
 
-    df[,numeric_cols] <- lapply(df[,numeric_cols, drop = FALSE], col_percentage, digits = 1)
-
-    if(check %in% c("Total","Sum")){
-      out <- jarvis::tbl_totals(df)
-    } else {
-      out <- df
+    if(check){
+      out <- jarvis::tbl_totals(out, loc = "col")
     }
-
   } else {
-    firstcol_lastrow <- rownames(df)[nrow(df)]
 
-    check <- toString(df[firstcol_lastrow,1])
+    check <- any(names(df) %in% c("Total","Sum"))
 
-    if(check %in% c("Total","Sum")){
-      df <- head(df, -1)
+    if(check){
+      df <- df[,-ncol(df), drop = FALSE]
     }
 
-    numeric_cols <- sapply(df, is.numeric)
-    df[is.na(df)] <- 0
-    row_sum <- rowSums(df[,numeric_cols])
+    row_sums <- rowSums(df[ , sapply(df, is.numeric)])
+    prop_tbl <- sweep(df[ , sapply(df, is.numeric)], 1, row_sums, FUN = "/")
+    prop_tbl <- purrr::map_dfr(prop_tbl, function(x){round(x * 100, digits = digits)})
+    out <- dplyr::bind_cols(df[,1], prop_tbl)
 
-    results <- round(sweep(df[,numeric_cols], 1, row_sum, FUN = "/") * 100, digits = digits)
-
-    col_to_add <- setdiff(colnames(df), colnames(results))
-
-    out <- cbind(df[,col_to_add], results)
-
-    if(check %in% c("Total","Sum")){
+    if(check){
       out <- jarvis::tbl_totals(out, loc = "row")
-    } else {
-      out
     }
-
   }
   return(out)
 }
@@ -156,5 +140,5 @@ collect_vars <- function(...){
 }
 
 rip_count <- function(df){
-  as.data.frame(table(df), stringsAsFactors = FALSE)
+  as.data.frame(table(df, useNA = "ifany"), stringsAsFactors = FALSE)
 }

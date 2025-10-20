@@ -21,5 +21,5 @@ Column Percentages
 }
 \examples{
 df <- data.frame(loc = c("A","B","C"), n = c(5,10,6))
-tbl_percentage(df)
+tbl_percentage(df, loc = "col")
 }
