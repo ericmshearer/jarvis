@@ -26,7 +26,7 @@ tbl <- function(df, ..., scaled = TRUE, digits = 1, pivot = FALSE){
       out <- init
     }
   } else {
-    init$percent <- OCepi::add_percent(init$n, digits = digits, multiply = scaled)
+    init$percent <- round(init$n/sum(init$n) * 100, digits = digits)
     out <- init
   }
   class(out) <- df_class
